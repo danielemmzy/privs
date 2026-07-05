@@ -131,18 +131,33 @@ def make_commits_from_pattern(year):
     pattern = load_pattern()
     start_date = first_sunday(year)
 
+    # Mapping from pattern character to commit count
+    # Adjust these numbers if you want darker/lighter results.
+    COMMIT_LEVELS = {
+        "1": 2,   # very light
+        "2": 5,   # light
+        "3": 10,  # medium
+        "4": 18,  # dark
+    }
+
     for row_idx, row in enumerate(pattern):
         for col_idx, char in enumerate(row):
+
             if char == " ":
-                continue  # empty pixel
+                continue
+
+            commits = COMMIT_LEVELS.get(char, 0)
+
+            if commits == 0:
+                continue
 
             commit_date = start_date + timedelta(
                 weeks=col_idx,
                 days=row_idx
             )
 
-            for i in range(1, COMMITS_PER_PIXEL + 1):
-                msg = f"{commit_date.date()} pixel commit {i}"
+            for i in range(commits):
+                msg = f"{commit_date.date()} pixel commit {i+1}"
 
                 with open(FILE_PATH, "w") as f:
                     f.write(msg)
